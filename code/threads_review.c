@@ -1,27 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#define NUM_THREADS 8
  //Imprimir a y b con 8 hilos
 
-void *funcion(void *ap) {
-    struct data *x;
-    x = ap;
-    printf("a: %i, b: %i", x->a, x->b);|
-}
-
-
-struct data{
+struct data
+{
     int a;
     int b;
 };
 
-int main(){
+void *funcion(void *ap) 
+{
+    struct data *x;
+    x = ap;
+    printf("a: %i, b: %i\n", x -> a, x -> b); // -> es la forma de extraer los parámetros usando un apuntador
 
+    return 0;
+}
+
+
+int main()
+{
+    // Variables
     pthread_t thread[8];
-    struct data arg[8]; //falta for para llenar datos de lo contrario, SALE MAL.
-    void **retval;
+    struct data arg[8]; 
+    int** retval;
 
-    for(int i=0; i<8; i++)
+    for (int i = 0; i < NUM_THREADS; i++)
+    {   
+        
+        arg[i].a = i + 1; // # of thread
+        arg[i].b = i + 2;
+    }
+    
+
+    for(int i = 0; i < NUM_THREADS; i++)
     {
         int r = pthread_create(&thread[i], NULL, funcion, (void*) &arg[i]);
         if(r != 0)
@@ -31,9 +45,12 @@ int main(){
         }
     }
 
-    for(int i=0; i < 8; i++)
+    for(int i=0; i < NUM_THREADS; i++)
     {
-        pthread_join(thread[i], retval);
+        pthread_join(thread[i], (void **) retval);
     }
+
+    /* Last thing that main() should do */
+    pthread_exit(NULL);
     return 0;
 }
