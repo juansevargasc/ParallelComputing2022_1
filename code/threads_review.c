@@ -27,6 +27,7 @@ int main()
     struct data arg[8]; 
     int** retval;
 
+    // Llenar cada estructura con sus dos números.
     for (int i = 0; i < NUM_THREADS; i++)
     {   
         
@@ -35,6 +36,7 @@ int main()
     }
     
 
+    // Creación de cada hilo. Pasar cada hilo como struct, la función y sus argumentos (ya listos)
     for(int i = 0; i < NUM_THREADS; i++)
     {
         int r = pthread_create(&thread[i], NULL, funcion, (void*) &arg[i]);
@@ -45,7 +47,8 @@ int main()
         }
     }
 
-    for(int i=0; i < NUM_THREADS; i++)
+    // Hacer join de cada hilo para esperar que todos terminen.
+    for(int i = 0; i < NUM_THREADS; i++)
     {
         pthread_join(thread[i], (void **) retval);
     }
