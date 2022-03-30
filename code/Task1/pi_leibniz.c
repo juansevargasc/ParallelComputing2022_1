@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
-#define NUM_THREADS 2
+#define NUM_THREADS 4
 #define ITERATIONS 1e09
 
 double piTotal[NUM_THREADS];
@@ -46,7 +46,7 @@ int main()
     int** retval;
     double pi = 0;
 
-    //
+    //TIME
     struct timeval tval_before, tval_after, tval_result;
     gettimeofday(&tval_before, NULL);
 
