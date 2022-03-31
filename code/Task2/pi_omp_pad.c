@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include "omp.h"
+
+#define NUM_THREADS 16
+#define ITERATIONS 1e09
+#define PAD 8
+
+double piTotal[NUM_THREADS * PAD];
+
+
+int calculate_pi(int id)
+{
+    printf("THREAD #%d now running!\n", id);
+
+    int portion = (ITERATIONS/NUM_THREADS);
+    int begin = id * portion;
+    int end = (begin + portion);
+
+
+    // Portion of pi calculation
+    for (int i = begin; i < end; i++)
+    {
+        /* code */
+        //printf("Test with id: %i\n", id);
+        int positive = ( (4 * i) + 1);
+        int negative = positive + 2;
+
+        *(piTotal + (id * PAD)) += (double) 4 / positive;
+        *(piTotal + (id * PAD)) -= (double) 4 / negative;
+    }
+
+    return 0;
+    
+}
+
+int main()
+{
+    //TIME
+    struct timeval tval_before, tval_after, tval_result;
+    gettimeofday(&tval_before, NULL);
+
+    // Variables
+    double pi[NUM_THREADS];
+    int threads = NUM_THREADS;
+
+    // Llenar región de memoria
+    for (int i = 0; i < threads; i++)
+    {
+        *(piTotal + (i * PAD) ) = 0;
+    }
+    
+
+    // Thread creation.
+    #pragma omp parallel num_threads(threads)
+    {
+        int ID = omp_get_thread_num(); 
+        calculate_pi(ID);
+    }
+    
+    double* res;
+    double q = 0.0;
+    res = &q;
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
+        /* code */
+        *res += *(piTotal + (i * PAD) );
+    }
+    
+    
+    printf("PI: %2.12f", *res);
+    /* Last thing that main() should do */
+
+    // RESULTS
+    gettimeofday(&tval_after, NULL);
+    timersub(&tval_after, &tval_before, &tval_result);
+    printf("\nTime elapsed: %ld.%06ld\n", (long int)tval_result.tv_sec, (long int)tval_result.tv_usec);
+    
+
+    return 0;
+}
